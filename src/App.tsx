@@ -1,12 +1,22 @@
-import "./App.css";
+import { Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
+
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-200">
-      <div className="rounded-xl bg-blue-600 p-8 text-center shadow-lg">
-        <h1 className="text-6xl font-bold text-white">Tailwind !</h1>
-        <p className="mt-2 text-lg text-blue-100"></p>
-      </div>
+    <div className="bg-gray-50 min-h-screen">
+      <Navbar />
+      <main className="py-10">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </main>
     </div>
   );
 }
