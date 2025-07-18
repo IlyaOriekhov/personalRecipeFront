@@ -6,6 +6,10 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
+import MyRecipesPage from "./pages/MyRecipesPage";
+import AddRecipePage from "./pages/AddRecipePage";
+
+import ProtectedRoute from "./router/ProtectedRoute";
 
 import { Toaster } from "react-hot-toast";
 
@@ -20,6 +24,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/recipe/:id" element={<RecipeDetailPage />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/my-recipes" element={<MyRecipesPage />} />
+            <Route path="/add-recipe" element={<AddRecipePage />} />
+          </Route>
         </Routes>
       </main>
     </div>
