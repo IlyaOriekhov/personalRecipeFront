@@ -1,19 +1,42 @@
+// src/pages/RegisterPage.tsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
+import { isAxiosError } from "axios";
+import toast from "react-hot-toast";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, email, password });
+
+    try {
+      await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      toast.success("Account created successfully! You can now log in.");
+      navigate("/login");
+    } catch (err) {
+      if (isAxiosError(err) && err.response) {
+        toast.error(err.response.data.message || "Validation error.");
+      } else {
+        toast.error("An unknown error occurred. Please try again.");
+      }
+      console.error(err);
+    }
   };
 
   return (
     <div className="mx-auto max-w-md">
       <h2 className="text-center text-2xl font-bold text-gray-800">
-        Create an account
+        Create an Account
       </h2>
       <form
         onSubmit={handleSubmit}
@@ -40,7 +63,7 @@ const RegisterPage = () => {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700"
           >
-            Email
+            Email Address
           </label>
           <input
             id="email"
@@ -71,7 +94,7 @@ const RegisterPage = () => {
           type="submit"
           className="w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Register
+          Create Account
         </button>
       </form>
     </div>
