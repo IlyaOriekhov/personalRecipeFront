@@ -7,4 +7,5 @@ export interface Recipe {
   author: {
     name: string | null;
   };
+  ratings: { value: number }[];
 }
