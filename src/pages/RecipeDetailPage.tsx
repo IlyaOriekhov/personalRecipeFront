@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
 import { Recipe } from "../types";
@@ -12,9 +12,10 @@ const RecipeDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useAuth();
 
-  const fetchRecipe = async () => {
+  const fetchRecipe = useCallback(async () => {
     if (!id) return;
     try {
+      setLoading(true);
       const response = await api.get(`/recipes/${id}`);
       setRecipe(response.data);
     } catch (error) {
@@ -23,11 +24,11 @@ const RecipeDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchRecipe();
-  }, [id]);
+  }, [fetchRecipe]);
 
   const handleRate = async (value: number) => {
     try {
@@ -40,8 +41,13 @@ const RecipeDetailPage = () => {
     }
   };
 
-  if (loading) return <div className="text-center">Loading...</div>;
-  if (!recipe) return <div className="text-center">Recipe not found.</div>;
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  if (!recipe) {
+    return <div className="text-center">Recipe not found.</div>;
+  }
 
   const averageRating =
     recipe.ratings.length > 0
@@ -49,9 +55,20 @@ const RecipeDetailPage = () => {
         recipe.ratings.length
       : 0;
 
+  const placeholderImage =
+    "https://via.placeholder.com/800x400.png?text=No+Image";
+
   return (
     <div className="mx-auto max-w-4xl px-4">
       <div className="rounded-lg bg-white p-8 shadow-lg">
+        <div className="mb-6 overflow-hidden rounded-lg">
+          <img
+            src={recipe.imageUrl || placeholderImage}
+            alt={recipe.title}
+            className="h-96 w-full object-cover"
+          />
+        </div>
+
         <h1 className="mb-2 text-4xl font-bold text-gray-900">
           {recipe.title}
         </h1>

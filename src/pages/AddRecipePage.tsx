@@ -1,3 +1,4 @@
+// src/pages/AddRecipePage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -8,26 +9,54 @@ const AddRecipePage = () => {
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsUploading(true);
+    let imageUrl = "";
 
-    const ingredientsArray = ingredients.split(",").map((item) => item.trim());
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("upload_preset", "recipes");
+
+      try {
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/dxxohv4f7/image/upload`,
+          { method: "POST", body: formData }
+        );
+        const data = await response.json();
+        imageUrl = data.secure_url;
+      } catch (error) {
+        toast.error("Image upload failed.");
+        console.error(error);
+        setIsUploading(false);
+        return;
+      }
+    }
 
     try {
+      const ingredientsArray = ingredients
+        .split(",")
+        .map((item) => item.trim());
       const response = await api.post("/recipes", {
         title,
         description,
         ingredients: ingredientsArray,
         instructions,
+        imageUrl,
       });
 
       toast.success("Recipe added successfully!");
       navigate(`/recipe/${response.data.id}`);
     } catch (error) {
-      toast.error("Failed to add recipe. Please try again.");
+      toast.error("Failed to add recipe.");
       console.error(error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -107,11 +136,28 @@ const AddRecipePage = () => {
           ></textarea>
         </div>
 
+        <div>
+          <label
+            htmlFor="image"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Image
+          </label>
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={(e) => e.target.files && setImageFile(e.target.files[0])} // <-- ВИПРАВЛЕННЯ 1
+            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </div>
+
         <button
           type="submit"
-          className="w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          disabled={isUploading} // <-- ВИПРАВЛЕННЯ 2
+          className="w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400"
         >
-          Add Recipe
+          {isUploading ? "Saving..." : "Add Recipe"}
         </button>
       </form>
     </div>

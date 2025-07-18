@@ -4,6 +4,7 @@ export interface Recipe {
   description: string | null;
   ingredients: string[];
   instructions: string;
+  imageUrl?: string;
   author: {
     name: string | null;
   };
