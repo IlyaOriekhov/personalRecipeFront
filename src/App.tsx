@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
 import MyRecipesPage from "./pages/MyRecipesPage";
 import AddRecipePage from "./pages/AddRecipePage";
+import EditRecipePage from "./pages/EditRecipePage";
 
 import ProtectedRoute from "./router/ProtectedRoute";
 
@@ -28,6 +29,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/my-recipes" element={<MyRecipesPage />} />
             <Route path="/add-recipe" element={<AddRecipePage />} />
+            <Route path="/recipe/:id/edit" element={<EditRecipePage />} />
           </Route>
         </Routes>
       </main>

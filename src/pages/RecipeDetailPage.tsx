@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { Recipe } from "../types";
 import toast from "react-hot-toast";
@@ -10,7 +10,7 @@ const RecipeDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const fetchRecipe = useCallback(async () => {
     if (!id) return;
@@ -68,6 +68,17 @@ const RecipeDetailPage = () => {
             className="h-96 w-full object-cover"
           />
         </div>
+
+        {user && user.id === recipe.authorId && (
+          <div className="mb-4 text-right">
+            <Link
+              to={`/recipe/${recipe.id}/edit`}
+              className="rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-300"
+            >
+              Edit Recipe
+            </Link>
+          </div>
+        )}
 
         <h1 className="mb-2 text-4xl font-bold text-gray-900">
           {recipe.title}

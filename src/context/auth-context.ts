@@ -9,3 +9,16 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
+
+interface User {
+  id: number;
+  name: string | null;
+  email: string;
+}
+
+interface AuthContextType {
+  isAuthenticated: boolean;
+  user: User | null; // <-- Додаємо
+  login: (token: string) => Promise<void>;
+  logout: () => void;
+}
