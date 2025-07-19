@@ -12,6 +12,9 @@ const RecipeDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const { isAuthenticated, user } = useAuth();
 
+  const [aiTip, setAiTip] = useState<string>("");
+  const [isLoadingTip, setIsLoadingTip] = useState(false);
+
   const fetchRecipe = useCallback(async () => {
     if (!id) return;
     try {
@@ -38,6 +41,20 @@ const RecipeDetailPage = () => {
     } catch (error) {
       toast.error("Failed to submit rating.");
       console.error(error);
+    }
+  };
+
+  const getAiTip = async () => {
+    setIsLoadingTip(true);
+    setAiTip("");
+    try {
+      const response = await api.post(`/recipes/${id}/ai-tip`);
+      setAiTip(response.data.tip);
+    } catch (error) {
+      toast.error("Could not get a tip from AI.");
+      console.error(error);
+    } finally {
+      setIsLoadingTip(false);
     }
   };
 
@@ -133,6 +150,24 @@ const RecipeDetailPage = () => {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {isAuthenticated && (
+          <div className="mt-8 border-t pt-6">
+            <h3 className="text-xl font-semibold">FlavorAI Assistant</h3>
+            <button
+              onClick={getAiTip}
+              disabled={isLoadingTip}
+              className="mt-2 rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:bg-gray-400"
+            >
+              {isLoadingTip ? "Generating..." : "Get a Cooking Tip"}
+            </button>
+            {aiTip && (
+              <div className="mt-4 rounded-md bg-purple-50 p-4">
+                <p className="text-purple-800">{aiTip}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
